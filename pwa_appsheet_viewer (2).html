@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AppSheet Viewer</title>
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiQXBwU2hlZXQgVmlld2VyIiwic2hvcnRfbmFtZSI6IkFwcFZpZXciLCJzdGFydF91cmwiOiIvIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiIzAwMDAwMCIsInRoZW1lX2NvbG9yIjoiIzAwNzNlNiIsImljb25zIjpbeyJzcmMiOiJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBITjJaeUIzYVdSMGFEMGlOVEV5SWlCb1pXbG5hSFE5SWpVeE1pSWdkbWxsZDBKdmVEMGlNQ0F3SURVNU1pQTFPVElpSUdacGJHdzlJaU13TURjelpUWWlQanh5WldOMElIZzlJamMySWlCNVBTSTNOaUlnZDJsa2RHZzlJak0yTUNJZ2FHVnBaMmgwUFNJek5qQWlJSEo0UFNJeE9DSWdabWxzYkQwaUkzWm1abVptWmlJdlBqd3ZjM1puUGc9PSIsInNpemVzIjoiNTEyeDUxMiIsInR5cGUiOiJpbWFnZS9zdmcreG1sIn1dfQ==">
+    <meta name="theme-color" content="#0073e6">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #0073e6;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo::before {
+            content: "📊";
+            font-size: 28px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid #0073e6;
+        }
+
+        .btn {
+            background: #0073e6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background: #005bb5;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 115, 230, 0.3);
+        }
+
+        .btn-logout {
+            background: #dc3545;
+        }
+
+        .btn-logout:hover {
+            background: #c82333;
+        }
+
+        .login-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 80vh;
+            text-align: center;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .login-card h1 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .login-card p {
+            margin-bottom: 30px;
+            color: #666;
+        }
+
+        .g_id_signin {
+            margin: 0 auto 20px auto;
+            display: flex;
+            justify-content: center;
+        }
+
+        .data-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .data-table th {
+            background: #f8f9fa;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #0073e6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .refresh-btn {
+            background: #28a745;
+            margin-left: 10px;
+        }
+
+        .refresh-btn:hover {
+            background: #218838;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #0073e6;
+        }
+
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .container {
+                padding: 10px;
+            }
+
+            .data-table {
+                font-size: 14px;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 8px 10px;
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Screen -->
+        <div id="loginScreen" class="login-screen">
+            <div class="login-card">
+                <h1>AppSheet Viewer</h1>
+                <p>Faça login com a sua conta Google para aceder aos seus dados</p>
+                <div id="g_id_onload"
+                     data-client_id="YOUR_707891365376-q8id1oa16b72f8m1trudhtnsjjspvf83.apps.googleusercontent.com.apps.googleusercontent.com"
+                     data-context="signin"
+                     data-ux_mode="popup"
+                     data-callback="handleCredentialResponse"
+                     data-auto_prompt="false">
+                </div>
+                <div class="g_id_signin"
+                     data-type="standard"
+                     data-shape="rectangular"
+                     data-theme="outline"
+                     data-text="signin_with"
+                     data-size="large"
+                     data-logo_alignment="left">
+                </div>
+                <button id="loginBtn" class="btn" style="margin-top: 20px; background: #f8f9fa; color: #333; border: 1px solid #dadce0;">
+                    ↖️ Ou clique no botão Google acima
+                </button>
+            </div>
+        </div>
+
+        <!-- Main App -->
+        <div id="mainApp" class="hidden">
+            <div class="header">
+                <div class="logo">AppSheet Viewer</div>
+                <div class="user-info">
+                    <img id="userAvatar" class="user-avatar" src="" alt="Avatar">
+                    <span id="userName">Utilizador</span>
+                    <button id="refreshBtn" class="btn refresh-btn">🔄 Atualizar</button>
+                    <button id="logoutBtn" class="btn btn-logout">Sair</button>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="data-section">
+                <div class="section-title">📈 Estatísticas</div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalRecords">-</div>
+                        <div class="stat-label">Total de Registos</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="lastUpdate">-</div>
+                        <div class="stat-label">Última Atualização</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Table -->
+            <div class="data-section">
+                <div class="section-title">
+                    📊 Dados da Tabela
+                    <button id="exportBtn" class="btn" style="margin-left: auto; font-size: 14px; padding: 8px 16px;">📥 Exportar</button>
+                </div>
+                <div id="dataContainer">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>A carregar dados...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
+    <script>
+        // Configuration - ATUALIZAR COM OS SEUS DADOS
+        const CONFIG = {
+            707891365376-q8id1oa16b72f8m1trudhtnsjjspvf83.apps.googleusercontent.com: 'YOUR_707891365376-q8id1oa16b72f8m1trudhtnsjjspvf83.apps.googleusercontent.com.apps.googleusercontent.com',
+            APPSHEET_APP_ID: 'YOUR_APPSHEET_APP_ID',
+            APPSHEET_TABLE_NAME: 'YOUR_TABLE_NAME',
+            APPSHEET_API_KEY: 'YOUR_APPSHEET_API_KEY'
+        };
+
+        // Sample data for demonstration
+        const SAMPLE_DATA = [
+            { id: 1, nome: 'João Silva', email: 'joao@email.com', departamento: 'Vendas', status: 'Ativo', data_registo: '2024-01-15' },
+            { id: 2, nome: 'Maria Santos', email: 'maria@email.com', departamento: 'Marketing', status: 'Ativo', data_registo: '2024-01-18' },
+            { id: 3, nome: 'Pedro Costa', email: 'pedro@email.com', departamento: 'TI', status: 'Inativo', data_registo: '2024-01-20' },
+            { id: 4, nome: 'Ana Ferreira', email: 'ana@email.com', departamento: 'RH', status: 'Ativo', data_registo: '2024-01-22' },
+            { id: 5, nome: 'Carlos Oliveira', email: 'carlos@email.com', departamento: 'Financeiro', status: 'Ativo', data_registo: '2024-01-25' }
+        ];
+
+        class AppSheetViewer {
+            constructor() {
+                this.currentUser = null;
+                this.data = [];
+                this.initializeApp();
+            }
+
+            initializeApp() {
+                this.setupEventListeners();
+                this.checkStoredAuth();
+                this.initializeGoogleAuth();
+                this.registerServiceWorker();
+            }
+
+            setupEventListeners() {
+                document.getElementById('loginBtn').addEventListener('click', () => this.signInWithGoogle());
+                document.getElementById('logoutBtn').addEventListener('click', () => this.signOut());
+                document.getElementById('refreshBtn').addEventListener('click', () => this.loadData());
+                document.getElementById('exportBtn').addEventListener('click', () => this.exportData());
+            }
+
+            checkStoredAuth() {
+                const storedUser = localStorage.getItem('appsheet_user');
+                if (storedUser) {
+                    this.currentUser = JSON.parse(storedUser);
+                    this.showMainApp();
+                    this.loadData();
+                }
+            }
+
+            initializeGoogleAuth() {
+                // Torna a função de callback global para o botão Google
+                window.handleCredentialResponse = this.handleCredentialResponse.bind(this);
+                
+                if (typeof google !== 'undefined') {
+                    google.accounts.id.initialize({
+                        client_id: '707891365376-q8id1oa16b72f8m1trudhtnsjjspvf83.apps.googleusercontent.com',
+                        callback: this.handleCredentialResponse.bind(this),
+                        auto_select: false
+                    });
+                    
+                    // Renderiza o botão oficial do Google
+                    setTimeout(() => {
+                        try {
+                            google.accounts.id.renderButton(
+                                document.querySelector('.g_id_signin'),
+                                {
+                                    type: 'standard',
+                                    shape: 'rectangular',
+                                    theme: 'outline',
+                                    text: 'signin_with',
+                                    size: 'large',
+                                    logo_alignment: 'left'
+                                }
+                            );
+                        } catch (error) {
+                            console.log('Botão Google não disponível, usando fallback');
+                        }
+                    }, 500);
+                }
+            }
+
+            handleCredentialResponse(response) {
+                try {
+                    const payload = JSON.parse(atob(response.credential.split('.')[1]));
+                    this.currentUser = {
+                        name: payload.name,
+                        email: payload.email,
+                        picture: payload.picture
+                    };
+                    
+                    localStorage.setItem('appsheet_user', JSON.stringify(this.currentUser));
+                    this.showMainApp();
+                    this.loadData();
+                } catch (error) {
+                    console.error('Erro ao processar credenciais:', error);
+                    this.showError('Erro no login. Tente novamente.');
+                }
+            }
+
+            signInWithGoogle() {
+                if (typeof google !== 'undefined') {
+                    // Se o botão oficial não funcionar, usa o popup
+                    google.accounts.id.prompt();
+                } else {
+                    // Fallback for demo - simulate login
+                    this.currentUser = {
+                        name: 'Utilizador Demo',
+                        email: 'demo@email.com',
+                        picture: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0iIzAwNzNlNiI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiLz48dGV4dCB4PSIyMCIgeT0iMjYiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNiIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkQ8L3RleHQ+PC9zdmc+'
+                    };
+                    
+                    localStorage.setItem('appsheet_user', JSON.stringify(this.currentUser));
+                    this.showMainApp();
+                    this.loadData();
+                }
+            }
+
+            signOut() {
+                localStorage.removeItem('appsheet_user');
+                this.currentUser = null;
+                this.data = [];
+                this.showLoginScreen();
+            }
+
+            showMainApp() {
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                
+                if (this.currentUser) {
+                    document.getElementById('userName').textContent = this.currentUser.name;
+                    document.getElementById('userAvatar').src = this.currentUser.picture;
+                }
+            }
+
+            showLoginScreen() {
+                document.getElementById('mainApp').classList.add('hidden');
+                document.getElementById('loginScreen').classList.remove('hidden');
+            }
+
+            async loadData() {
+                try {
+                    this.showLoading();
+                    
+                    // Simulate API call - replace with actual AppSheet API call
+                    await this.delay(1500);
+                    
+                    // For demo purposes, use sample data
+                    // In production, replace with actual AppSheet API call:
+                    // const data = await this.fetchFromAppSheet();
+                    this.data = SAMPLE_DATA;
+                    
+                    this.updateStats();
+                    this.renderTable();
+                    
+                } catch (error) {
+                    console.error('Erro ao carregar dados:', error);
+                    this.showError('Erro ao carregar dados da AppSheet. Verifique a configuração da API.');
+                }
+            }
+
+            async fetchFromAppSheet() {
+                // Example AppSheet API call structure
+                const response = await fetch(`https://api.appsheet.com/api/v2/apps/${CONFIG.APPSHEET_APP_ID}/tables/${CONFIG.APPSHEET_TABLE_NAME}/Action`, {
+                    method: 'POST',
+                    headers: {
+                        'ApplicationAccessKey': CONFIG.APPSHEET_API_KEY,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        "Action": "Find",
+                        "Properties": {},
+                        "Rows": []
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Erro na API AppSheet');
+                }
+                
+                return await response.json();
+            }
+
+            updateStats() {
+                document.getElementById('totalRecords').textContent = this.data.length;
+                document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString('pt-PT');
+            }
+
+            renderTable() {
+                const container = document.getElementById('dataContainer');
+                
+                if (this.data.length === 0) {
+                    container.innerHTML = '<p class="loading">Nenhum dado encontrado.</p>';
+                    return;
+                }
+
+                // Get table headers from first object
+                const headers = Object.keys(this.data[0]);
+                
+                let tableHTML = `
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                ${headers.map(header => `<th>${this.formatHeader(header)}</th>`).join('')}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${this.data.map(row => `
+                                <tr>
+                                    ${headers.map(header => `<td>${this.formatCellData(row[header])}</td>`).join('')}
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+                
+                container.innerHTML = tableHTML;
+            }
+
+            formatHeader(header) {
+                return header.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            }
+
+            formatCellData(data) {
+                if (data === null || data === undefined) return '-';
+                if (typeof data === 'boolean') return data ? 'Sim' : 'Não';
+                if (typeof data === 'string' && data.match(/^\d{4}-\d{2}-\d{2}/)) {
+                    return new Date(data).toLocaleDateString('pt-PT');
+                }
+                return data;
+            }
+
+            showLoading() {
+                document.getElementById('dataContainer').innerHTML = `
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>A carregar dados...</p>
+                    </div>
+                `;
+            }
+
+            showError(message) {
+                document.getElementById('dataContainer').innerHTML = `
+                    <div class="error">
+                        <strong>Erro:</strong> ${message}
+                    </div>
+                `;
+            }
+
+            exportData() {
+                if (this.data.length === 0) {
+                    alert('Não há dados para exportar.');
+                    return;
+                }
+
+                const csv = this.convertToCSV(this.data);
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                
+                link.setAttribute('href', url);
+                link.setAttribute('download', `appsheet_data_${new Date().toISOString().split('T')[0]}.csv`);
+                link.style.visibility = 'hidden';
+                
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+
+            convertToCSV(data) {
+                if (!data.length) return '';
+                
+                const headers = Object.keys(data[0]);
+                const csvHeaders = headers.join(',');
+                const csvRows = data.map(row => 
+                    headers.map(header => {
+                        const value = row[header];
+                        return typeof value === 'string' && value.includes(',') 
+                            ? `"${value}"` 
+                            : value;
+                    }).join(',')
+                );
+                
+                return [csvHeaders, ...csvRows].join('\n');
+            }
+
+            registerServiceWorker() {
+                if ('serviceWorker' in navigator) {
+                    const swCode = `
+                        const CACHE_NAME = 'appsheet-viewer-v1';
+                        const urlsToCache = ['/'];
+                        
+                        self.addEventListener('install', event => {
+                            event.waitUntil(
+                                caches.open(CACHE_NAME)
+                                    .then(cache => cache.addAll(urlsToCache))
+                            );
+                        });
+                        
+                        self.addEventListener('fetch', event => {
+                            event.respondWith(
+                                caches.match(event.request)
+                                    .then(response => response || fetch(event.request))
+                            );
+                        });
+                    `;
+                    
+                    const blob = new Blob([swCode], { type: 'application/javascript' });
+                    const swUrl = URL.createObjectURL(blob);
+                    
+                    navigator.serviceWorker.register(swUrl)
+                        .then(() => console.log('Service Worker registado'))
+                        .catch(err => console.log('Erro no Service Worker:', err));
+                }
+            }
+
+            delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
+            tryAutoLogin() {
+                // Removido - agora usamos apenas o botão oficial
+            }
+
+            getUserFromBrowser() {
+                // Removido - agora usamos apenas o botão oficial
+            }
+        }
+
+        // Initialize app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new AppSheetViewer();
+        });
+
+        // Install prompt for PWA
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // Show install button or notification
+            console.log('PWA pode ser instalada');
+        });
+    </script>
+</body>
+</html>
